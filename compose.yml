@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  scheduler:
+    build: .
+    container_name: scheduler
+    restart: unless-stopped
+
+    ports:
+      - "7540:7540"
+
+    env_file:
+      - envFile.env
+
+    environment:
+      TODO_PORT: "7540"
+      TODO_DBFILE: "/db/scheduler.db"
+
+    volumes:
+      - ./db-data:/db
+      - ./web:/app/web:ro
