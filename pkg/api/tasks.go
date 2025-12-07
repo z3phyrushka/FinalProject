@@ -3,8 +3,10 @@ package api
 import (
 	"net/http"
 
-	"Final-project/pkg/db"
+	"FinalProject/pkg/db"
 )
+
+const maxTasksLimit = 50
 
 type TasksResp struct {
 	Tasks []*db.Task `json:"tasks"`
@@ -13,7 +15,7 @@ type TasksResp struct {
 func tasksHandler(w http.ResponseWriter, r *http.Request) {
 	search := r.URL.Query().Get("search")
 
-	tasks, err := db.Tasks(50, search)
+	tasks, err := db.Tasks(maxTasksLimit, search)
 	if err != nil {
 		writeJSON(w, map[string]string{"error": err.Error()}, http.StatusInternalServerError)
 		return

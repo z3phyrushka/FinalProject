@@ -2,13 +2,18 @@ package api
 
 import (
 	"net/http"
-	"strings"
 	"time"
 
-	"Final-project/pkg/db"
+	"FinalProject/pkg/db"
 )
 
 func taskDoneHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	id := r.URL.Query().Get("id")
 	if id == "" {
 		writeJSON(w, map[string]string{"error": "id is required"}, http.StatusBadRequest)
@@ -21,27 +26,23 @@ func taskDoneHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	repeat := strings.TrimSpace(task.Repeat)
-
-	if repeat == "" {
+	if task.Repeat == "" {
 		if err := db.DeleteTask(id); err != nil {
-			writeJSON(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
+			writeJSON(w, map[string]string{"error": err.Error()}, http.StatusInternalServerError)
 			return
 		}
 		writeJSON(w, map[string]any{}, http.StatusOK)
 		return
 	}
 
-	now := todayUTC()
-
-	next, err := NextDate(now, task.Date, repeat)
+	next, err := NextDate(time.Now(), task.Date, task.Repeat)
 	if err != nil {
 		writeJSON(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
 		return
 	}
 
 	if err := db.UpdateDate(next, id); err != nil {
-		writeJSON(w, map[string]string{"error": err.Error()}, http.StatusBadRequest)
+		writeJSON(w, map[string]string{"error": err.Error()}, http.StatusInternalServerError)
 		return
 	}
 

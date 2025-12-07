@@ -8,28 +8,13 @@ import (
 	"strings"
 	"time"
 
-	"Final-project/pkg/db"
+	"FinalProject/pkg/db"
 )
 
 func writeJSON(w http.ResponseWriter, v any, code int) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(code)
 	_ = json.NewEncoder(w).Encode(v)
-}
-
-func taskHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPost:
-		addTaskHandler(w, r)
-	case http.MethodGet:
-		getTaskHandler(w, r)
-	case http.MethodPut:
-		updateTaskHandler(w, r)
-	case http.MethodDelete:
-		deleteTaskHandler(w, r)
-	default:
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-	}
 }
 
 func getTaskHandler(w http.ResponseWriter, r *http.Request) {

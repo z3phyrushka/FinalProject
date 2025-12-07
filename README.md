@@ -73,7 +73,7 @@ Final-project/
 4. Локальный запуск
 Переменные окружения
 
-Файл envFile.env (пример):
+Файл .env (пример):
 
 TODO_PORT=7540
 TODO_DBFILE=scheduler.db
@@ -83,7 +83,7 @@ TODO_PASSWORD=12345
 Можно загрузить их:
 
 set -a
-source envFile.env
+source .env
 set +a
 
 Запуск

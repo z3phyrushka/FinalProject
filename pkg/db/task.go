@@ -16,9 +16,6 @@ type Task struct {
 }
 
 func AddTask(task *Task) (int64, error) {
-	if DB == nil {
-		return 0, sql.ErrConnDone
-	}
 	query := `INSERT INTO scheduler(date, title, comment, repeat) VALUES (?, ?, ?, ?)`
 	res, err := DB.Exec(query, task.Date, task.Title, task.Comment, task.Repeat)
 	if err != nil {
@@ -43,11 +40,6 @@ func parseSearchDate(s string) (string, bool) {
 }
 
 func Tasks(limit int, search string) ([]*Task, error) {
-
-	if DB == nil {
-		return nil, sql.ErrConnDone
-	}
-
 	var rows *sql.Rows
 	var err error
 
@@ -120,6 +112,10 @@ func scanTasks(rows *sql.Rows) ([]*Task, error) {
 		})
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	if tasks == nil {
 		tasks = []*Task{}
 	}
@@ -142,10 +138,6 @@ func GetTask(id string) (*Task, error) {
 }
 
 func UpdateTask(t *Task) error {
-	if DB == nil {
-		return sql.ErrConnDone
-	}
-
 	query := `UPDATE scheduler SET date = ?, title = ?, comment = ?, repeat = ? WHERE id = ?`
 	res, err := DB.Exec(query, t.Date, t.Title, t.Comment, t.Repeat, t.ID)
 	if err != nil {
@@ -164,9 +156,6 @@ func UpdateTask(t *Task) error {
 }
 
 func DeleteTask(id string) error {
-	if DB == nil {
-		return sql.ErrConnDone
-	}
 	query := `DELETE FROM scheduler WHERE id = ?`
 	res, err := DB.Exec(query, id)
 	if err != nil {
@@ -183,9 +172,6 @@ func DeleteTask(id string) error {
 }
 
 func UpdateDate(next string, id string) error {
-	if DB == nil {
-		return sql.ErrConnDone
-	}
 	query := `UPDATE scheduler SET date = ? WHERE id = ?`
 	res, err := DB.Exec(query, next, id)
 	if err != nil {

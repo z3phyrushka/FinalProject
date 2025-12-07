@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	myapi "Final-project/pkg/api"
-	mydb "Final-project/pkg/db"
+	myapi "FinalProject/pkg/api"
+	mydb "FinalProject/pkg/db"
 )
 
 func main() {
@@ -22,6 +22,7 @@ func main() {
 	if err := mydb.Init(dbFile); err != nil {
 		log.Fatal("DB init error: ", err)
 	}
+	defer mydb.Close()
 	myapi.Init()
 
 	port := os.Getenv("TODO_PORT")

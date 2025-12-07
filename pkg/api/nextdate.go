@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,35 +12,28 @@ const dateFormat = "20060102"
 
 func nextDayHandler(w http.ResponseWriter, r *http.Request) {
 	nowStr := r.FormValue("now")
-	dstart := r.FormValue("date")
+	date := r.FormValue("date")
 	repeat := r.FormValue("repeat")
 
-	var now time.Time
-	var err error
-
-	if nowStr == "" {
-		t := time.Now().UTC()
-		now = time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
-	} else {
-		now, err = time.Parse(dateFormat, nowStr)
-		if err != nil {
-			http.Error(w, "invalid now parameter", http.StatusBadRequest)
-			return
-		}
-	}
-
-	if dstart == "" {
-		http.Error(w, "date is empty", http.StatusBadRequest)
+	if nowStr == "" || date == "" || repeat == "" {
+		http.Error(w, "params required", http.StatusBadRequest)
 		return
 	}
 
-	next, err := NextDate(now, dstart, repeat)
+	now, err := parseDate(nowStr)
+	if err != nil {
+		http.Error(w, "invalid now date", http.StatusBadRequest)
+		return
+	}
+
+	next, err := NextDate(now, date, repeat)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	fmt.Fprint(w, next)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(next))
 }
 
 func parseDate(s string) (time.Time, error) {
